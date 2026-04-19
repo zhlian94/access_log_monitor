@@ -4,7 +4,7 @@ This repository contains a Python-based Apache Access Log processor, designed wi
 
 ## Architecture
 - **Log Processor**: A python daemon that tails `access.log`. It saves its offset in a `state.json` file to ensure no log line is processed redundantly, even if the container restarts.
-- **Metrics**: It hosts a Prometheus pull server (port 8000) that exposes native `Counter` metrics showing how many times specific target paths (e.g., `/api/login`) were hit. 
+- **Metrics**: It hosts a Prometheus pull server (port 8000) that exposes native `Counter` metrics showing how many times specific target paths (e.g., `/api/login`) were hit.
 - **Docker**: Containerized for lightweight distribution.
 - **Kubernetes**: Deployed as a **Sidecar paradigm**. The monitor container runs in the exact same Pod as the Apache container, sharing a volume where logs are written so it cleanly reads them off the disk in real-time.
 
@@ -76,3 +76,6 @@ curl http://localhost:8000/metrics
 ## Integrating with Grafana
 Because we annotated the Pod template with `prometheus.io/scrape: "true"`, if your Kubernetes cluster is running Prometheus, it will automatically begin pulling logs periodically from port 8000.
 In Grafana, you can easily query this dataset to make a time-series dashboard using simply: `apache_path_requests_total`
+=======
+# access_log_monitor
+>>>>>>> ad6be812116a909a77dc83a81b7f48f985cb3eb5
