@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-log-monitor
+  labels:
+    app: apache-log-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apache-log-monitor
+  template:
+    metadata:
+      labels:
+        app: apache-log-monitor
+      # Annotations are useful for Prometheus to automatically scrape this pod
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        # 1. The Main Apache Web Server (Simulation for demo)
+        - name: apache-server
+          image: httpd:2.4
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: apache-logs
+              mountPath: /usr/local/apache2/logs
+              
+        # 2. Sidecar Container: Our Log Monitor running Python
+        - name: log-monitor
+          # Change this to your dockerhub repo, e.g., myorg/access-log-monitor:latest
+          image: access-log-monitor:latest  
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: LOG_FILE_PATH
+              # Note the matching log path to Apache's default access log inside httpd container
+              value: "/var/log/apache2/access_log" 
+            - name: STATE_FILE_PATH
+              value: "/app/data/state.json"
+            - name: TARGET_PATHS
+              value: "/api/login,/checkout,/home"
+          volumeMounts:
+            # We mount the SAME volume so we can read what apache-server writes
+            - name: apache-logs
+              mountPath: /var/log/apache2
+              
+      volumes:
+        # A shared volume between the apache container and the monitor sidecar
+        - name: apache-logs
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-log-monitor-service
+  labels:
+    app: apache-log-monitor
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: metrics
+  selector:
+    app: apache-log-monitor
