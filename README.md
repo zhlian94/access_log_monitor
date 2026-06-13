@@ -1,6 +1,6 @@
 # Apache Access Log Monitor (SRE Demo)
 
-This repository contains a Python-based Apache Access Log processor, designed with SRE best practices to monitor distributed web server instances.
+This repository contains a Python-based Apache Access Log processor, designed with SRE best practices to monitor distributed web server instances
 
 ## Architecture
 - **Log Processor**: A python daemon that tails `access.log`. It saves its offset in a `state.json` file to ensure no log line is processed redundantly, even if the container restarts.
