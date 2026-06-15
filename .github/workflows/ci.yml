@@ -13,6 +13,13 @@ jobs:
       # Checkout repo
       - uses: actions/checkout@v4
 
+      # Install helper utilities required by actions/setup-python
+      - name: Install OS utilities
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y lsb-release
+
+
       # Set up Python
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
