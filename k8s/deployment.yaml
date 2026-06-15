@@ -22,7 +22,7 @@ spec:
       containers:
         # 1. The Main Apache Web Server (Simulation for demo)
         - name: apache-server
-          image: httpd:2.4
+          image: ghcr.io/zhlian94/access_log_monitor:eaaf5babd90dc78c098cb91bf46a36bf2b60f711
           ports:
             - containerPort: 80
           volumeMounts:
@@ -32,7 +32,7 @@ spec:
         # 2. Sidecar Container: Our Log Monitor running Python
         - name: log-monitor
           # Change this to your dockerhub repo, e.g., myorg/access-log-monitor:latest
-          image: access-log-monitor:latest  
+          image: ghcr.io/zhlian94/access_log_monitor:eaaf5babd90dc78c098cb91bf46a36bf2b60f711
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
