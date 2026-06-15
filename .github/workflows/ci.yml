@@ -1,17 +1,14 @@
-name: CI
+name: Access Log Monitor CI
 
-  env:
-    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-# ──────────────────────────────────────
-# 1️⃣ Add manual trigger
-# ──────────────────────────────────────
+# Manual trigger
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  # 👇 this line enables the “Run workflow” button
   workflow_dispatch:
 
 jobs:
