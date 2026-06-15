@@ -42,3 +42,8 @@ state.json
 *.log
 access.log
 data/
+*.log
+*.txt
+.env
+.github/act-secrets.env
+.secrets
