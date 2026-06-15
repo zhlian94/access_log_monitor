@@ -1,10 +1,8 @@
 name: Access Log Monitor CI
 
-# Force actions to run on Node 24 (avoids the deprecation warning)
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-# Manual trigger from the GitHub UI
 on:
   push:
     branches: [ main ]
@@ -15,7 +13,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    # Container provides Python 3.10 out‑of‑the‑box
     container:
       image: python:3.10-slim
     steps:
