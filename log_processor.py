@@ -55,10 +55,7 @@ def save_offset(offset):
     os.makedirs(os.path.dirname(STATE_FILE) or '.', exist_ok=True)
     try:
         with open(STATE_FILE, 'w') as f:
-            json.dump(
-    {'offset': offset, 'updated_at': datetime.now().isoformat()},
-    f
-)
+            json.dump({'offset': offset, 'updated_at': datetime.now().isoformat()},f)
     except Exception as e:
         logging.error('Failed to write state: %s', e)
 
