@@ -1,0 +1,89 @@
+# .github/workflows/cd.yml
+name: Access Log Monitor CD
+
+# ────────────────────────────────────────────────────────────────────────
+# Global environment & permissions – required for GHCR access
+# ────────────────────────────────────────────────────────────────────────
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read          # read repo files
+  packages: write          # push/pull images from GHCR
+  id-token: write         # needed for act’s Docker socket (optional)
+
+# ────────────────────────────────────────────────────────────────────────
+# Trigger: run after the CI workflow succeeds
+# ────────────────────────────────────────────────────────────────────────
+on:
+  workflow_run:
+    workflows: ["Access Log Monitor CI"]
+    types:
+      - completed
+  workflow_dispatch:
+
+# ────────────────────────────────────────────────────────────────────────
+jobs:
+  deploy:
+    # Only run when CI succeeded
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+
+    # When using act you stay on ubuntu‑latest (has Docker);
+    # on GitHub the same VM works.
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------------------------------------------
+      # 1️⃣ Checkout repository (so we have k8s/deployment.yaml)
+      # ---------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # 2️⃣ Log in to GHCR (required for both GitHub and act)
+      # ---------------------------------------------------------------
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------------------------------------------------------------
+      # 3️⃣ Pull the image that CI just built & pushed
+      # ---------------------------------------------------------------
+      - name: Pull Docker image from GHCR
+        run: |
+          docker pull ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      # ---------------------------------------------------------------
+      # 4️⃣ OPTIONAL – Run the container directly on Docker Desktop
+      # ---------------------------------------------------------------
+      - name: Run container locally (Docker Desktop)
+        run: |
+          # Remove any previous instance
+          docker rm -f access-log-monitor || true
+          # Start a fresh container
+          docker run -d \
+            --name access-log-monitor \
+            -p 8000:8000 \
+            -e LOG_FILE_PATH=/var/log/apache2/access.log \
+            -e STATE_FILE_PATH=/app/data/state.json \
+            -v $(pwd)/logs:/var/log/apache2 \
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      # ---------------------------------------------------------------
+      # 5️⃣ OPTIONAL – Deploy to the local Kubernetes cluster (Docker Desktop)
+      # ---------------------------------------------------------------
+      - name: Deploy to local Kubernetes (if you prefer K8s)
+        env:
+          KUBECONFIG: $HOME/.kube/config   # act will mount your host ~/.kube
+        run: |
+          # Verify kubectl is present
+          kubectl version --client
+          # Patch deployment.yaml to use the exact image tag we just pulled
+          sed -i "s|image:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" k8s/deployment.yaml
+          # Apply the manifest
+          kubectl apply -f k8s/deployment.yaml
+          # Wait for the rollout to finish
+          kubectl rollout status deployment/apache-log-monitor --timeout=60s
