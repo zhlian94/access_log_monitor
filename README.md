@@ -2,22 +2,18 @@
 
 
 
-A Python-based SRE / DevOps demo project for monitoring Apache access logs, exposing Prometheus metrics, containerizing the application with Docker, deploying it to Kubernetes, and demonstrating CI/CD automation with GitHub Actions.
+## Demo Purpose
 
-This project demonstrates a practical end-to-end workflow:
-```
-text
-Apache access logs
-        ↓
-Python log monitor
-        ↓
-Prometheus metrics
-        ↓
-Docker image
-        ↓
-Kubernetes sidecar deployment
-        ↓
-GitHub Actions CI/CD
+This repository is a public demo version of a workflow I built and tested locally. It is intended to show both architecture-level thinking and hands-on implementation across Python, Docker, Kubernetes, observability, and CI/CD automation.
+
+The goal is not only to describe a solution design, but also to demonstrate the working building blocks:
+
+- application logic in Python
+- container packaging with Docker
+- Kubernetes deployment using a sidecar pattern
+- Prometheus-style metrics exposure
+- GitHub Actions CI/CD workflow
+- manual and automated GitOps-style operations
 ```
 ---
 
