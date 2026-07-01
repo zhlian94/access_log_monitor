@@ -1,10 +1,10 @@
-## `Apache Access Log Monitor(demo)`
+## `Apache Access Log Monitor(CICD demo)`
 
 
 
 ## Demo Purpose
 
-This repository is a public demo version of a workflow I built and tested locally. It is intended to show both architecture-level thinking and hands-on implementation across Python, Docker, Kubernetes, observability, and CI/CD automation.
+This repository is a public demo version of a workflow I built and tested locally. It is intended to show both architecture-level thinking and hands-on implementation across Python, Docker, Kubernetes, observability, and CI/CD automation. "access log monitor" is just simple makeup, and Prometheus flow is removed for convenience to setup env locally
 
 The goal is not only to describe a solution design, but also to demonstrate the working building blocks:
 
